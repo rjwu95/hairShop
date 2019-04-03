@@ -1,8 +1,8 @@
-import { shopReducer } from '../reducers';
+import { reducer } from '../reducers';
 import { createStore, combineReducers } from 'redux';
 
 const rootReducer = combineReducers({
-  shop: shopReducer,
+  shop: reducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
