@@ -1,35 +1,47 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+// import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { AppState } from './src/store';
 import { connect, Provider } from 'react-redux';
+import { Ionicons } from '@expo/vector-icons';
 
 import store from './src/store';
-import { State } from './src/reducers';
+// import { State } from './src/reducers';
 import { getShop } from './src/actions';
+import { createBottomTabNavigator, createAppContainer } from 'react-navigation';
+import Shop from './src/components/Shop';
+import MyPage from './src/components/MyPage';
 
-interface AppProps {
-  getShop: typeof getShop;
-  shop: State;
+// interface AppProps {
+//   getShop: typeof getShop;
+//   shop: State;
+// }
+
+interface tabBar {
+  tintColor: string;
 }
 
-class App extends React.Component<AppProps> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity>
-          <View style={styles.button}>
-            <Text style={styles.font}>현위치로 찾기</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <View style={styles.button}>
-            <Text style={styles.font}>검색으로 찾기</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-}
+const Root = createBottomTabNavigator({
+  Shop: {
+    screen: Shop,
+    navigationOptions: {
+      tabBarLable: '헤어샵',
+      tabBarIcon: ({ tintColor }: tabBar) => (
+        <Ionicons name="ios-home" size={24} color={tintColor} />
+      ),
+    },
+  },
+  MyPage: {
+    screen: MyPage,
+    navigationOptions: {
+      tabBarLable: '마이',
+      tabBarIcon: ({ tintColor }: tabBar) => {
+        return <Ionicons name="ios-person" size={24} color={tintColor} />;
+      },
+    },
+  },
+});
+
+const AppContainer = createAppContainer(Root);
 
 const mapStateToProps = (state: AppState) => ({
   shop: state.shop,
@@ -38,30 +50,30 @@ const mapStateToProps = (state: AppState) => ({
 const Content = connect(
   mapStateToProps,
   { getShop },
-)(App);
+)(AppContainer);
 
-const AppContainer = () => (
-  <Provider store={store}>
-    <Content />
-  </Provider>
-);
+interface State {
+  isFontLoded: Boolean;
+}
 
-export default AppContainer;
+class App extends React.Component<State> {
+  state: State = {
+    isFontLoded: false,
+  };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  button: {
-    backgroundColor: '#DB7093',
-    margin: 10,
-    justifyContent: 'center',
-    height: '15%',
-    padding: 10,
-  },
-  font: { color: 'white', fontWeight: '700' },
-});
+  // async componentWillMount() {
+  //   await Font.loadAsync({
+  //     Ionicons: require('react-native-vector-icons/Fonts'),
+  //   });
+  // }
+
+  render() {
+    return (
+      <Provider store={store}>
+        <Content />
+      </Provider>
+    );
+  }
+}
+
+export default App;

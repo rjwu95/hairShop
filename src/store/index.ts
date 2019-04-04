@@ -1,8 +1,10 @@
-import { reducer } from '../reducers';
+import { shopReducer, addressReducer, addressModalReducer } from '../reducers';
 import { createStore, combineReducers } from 'redux';
 
 const rootReducer = combineReducers({
-  shop: reducer,
+  shop: shopReducer,
+  address: addressReducer,
+  addressModalVisible: addressModalReducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

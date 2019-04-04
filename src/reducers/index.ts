@@ -4,13 +4,19 @@ export interface Shop {
   rating: number;
 }
 
-export interface State {
+export interface ShopState {
   shops: Shop[];
+}
+export interface AddressState {
   address: string;
+}
+export interface AddressModalVisibleState {
+  addressModalVisible: boolean;
 }
 
 export const GET_SHOP = 'GET_SHOP';
 export const CHANGE_ADDRESS = 'CHANGE_ADDRESS';
+export const TOGGLE_ADDRESSMODAL = 'TOGGLE_ADDRESSMODAL';
 
 export interface GetShopAction {
   type: typeof GET_SHOP;
@@ -22,25 +28,56 @@ export interface ChangeAddress {
   payload: string;
 }
 
-const initialState: State = {
+export interface ToggleAddressModal {
+  type: typeof TOGGLE_ADDRESSMODAL;
+}
+
+const shopInitialState: ShopState = {
   shops: [],
+};
+const addressInitialState: AddressState = {
   address: '',
 };
+const addressModalVisibleInitialState: AddressModalVisibleState = {
+  addressModalVisible: false,
+};
 
-export function reducer(
-  state = initialState,
-  action: GetShopAction | ChangeAddress,
-): State {
+export function shopReducer(
+  state = shopInitialState,
+  action: GetShopAction,
+): ShopState {
   switch (action.type) {
     case GET_SHOP:
       return {
         shops: [...state.shops, action.payload],
-        address: state.address,
       };
+    default:
+      return state;
+  }
+}
+
+export function addressReducer(
+  state = addressInitialState,
+  action: ChangeAddress,
+): AddressState {
+  switch (action.type) {
     case CHANGE_ADDRESS:
       return {
-        shops: state.shops,
         address: action.payload,
+      };
+    default:
+      return state;
+  }
+}
+
+export function addressModalReducer(
+  state = addressModalVisibleInitialState,
+  action: ToggleAddressModal,
+): AddressModalVisibleState {
+  switch (action.type) {
+    case TOGGLE_ADDRESSMODAL:
+      return {
+        addressModalVisible: !state.addressModalVisible,
       };
     default:
       return state;
