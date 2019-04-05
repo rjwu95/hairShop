@@ -11,6 +11,7 @@ import { toggleAddressModal } from '../../actions';
 import { connect } from 'react-redux';
 import { AppState } from '../../store';
 import ShopEntry from './ShopEntry';
+import ShopDetail from './ShopDetail';
 
 const fakedata = [1, 2, 3];
 
@@ -59,7 +60,9 @@ class Shop extends React.Component<Props, localState> {
               style={{ flex: 1 }}
               data={fakedata}
               keyExtractor={item => item.toString()}
-              renderItem={() => <ShopEntry />}
+              renderItem={() => (
+                <ShopEntry navigation={this.props.navigation} />
+              )}
             />
           </View>
         </View>
@@ -81,7 +84,10 @@ const Connect = connect(
   { toggleAddressModal },
 )(Shop);
 
-export default createStackNavigator({ Connect });
+export default createStackNavigator({
+  Connect,
+  ShopDetail,
+});
 
 const styles = StyleSheet.create({
   container: {
