@@ -1,27 +1,32 @@
 import * as React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
+import { Shop } from '../../reducers/types';
 
 interface Props {
   navigation: NavigationScreenProp<any, any>;
+  data: Shop;
 }
 
-const ShopEntry = ({ navigation }: Props) => {
+const ShopEntry = ({ navigation, data }: Props) => {
   return (
     <TouchableOpacity
       style={{ height: 250 }}
-      onPress={() => navigation.navigate('ShopDetail')}
+      onPress={() =>
+        navigation.navigate('ShopDetail', {
+          data,
+        })
+      }
     >
       <Image
         source={{
-          uri:
-            'https://www.salonpricelady.com/wp-content/uploads/2016/02/hair-salon-inside.jpg',
+          uri: data.image[0],
         }}
         style={{ flex: 3 }}
       />
       <View style={styles.textContainer}>
         <View style={{ justifyContent: 'center' }}>
-          <Text style={{ fontSize: 19 }}>리차드 프로</Text>
+          <Text style={{ fontSize: 19 }}>{data.name}</Text>
           <Text style={{ fontSize: 13, color: '#a9a9a9' }}>
             응암/연신내 | 1.4km이내
           </Text>

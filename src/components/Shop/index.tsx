@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  AsyncStorage,
+} from 'react-native';
 import {
   createStackNavigator,
   NavigationScreenProp,
@@ -7,31 +13,35 @@ import {
 } from 'react-navigation';
 // import { Ionicons } from '@expo/vector-icons';
 import AddressModal from './AddressModal';
-import { toggleAddressModal } from '../../actions';
+import { Shop } from '../../reducers/types';
+import { toggleAddressModal, getShop } from '../../actions';
 import { connect } from 'react-redux';
-import { AppState } from '../../store';
 import ShopEntry from './ShopEntry';
 import ShopDetail from './ShopDetail';
-
-const fakedata = [1, 2, 3];
+import axios from 'axios';
+import { serverUrl } from '../../../config.json';
+import { AppState } from '../../store';
 
 interface Props {
   toggleAddressModal: typeof toggleAddressModal;
   navigation: NavigationScreenProp<any, any>;
+  shops: Shop[];
+  getShop: typeof getShop;
 }
 
 interface localState {
   isLoaded: boolean;
   modalVisible: boolean;
+  page: number;
 }
 
-class Shop extends React.Component<Props, localState> {
+class ShopScreen extends React.Component<Props, localState> {
   static navigationOptions = ({ navigation }: Props) => {
     const { params = {} } = navigation.state;
     return {
       headerTitle: (
         <TouchableOpacity onPress={params.toggleModal}>
-          <Text style={{ fontSize: 15 }}>주소</Text>
+          <Text style={{ fontSize: 16, fontWeight: '600' }}>주소</Text>
         </TouchableOpacity>
       ),
     };
@@ -40,14 +50,31 @@ class Shop extends React.Component<Props, localState> {
   state: localState = {
     isLoaded: false,
     modalVisible: false,
+    page: 1,
   };
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
     const { navigation } = this.props;
     navigation.setParams({
       toggleModal: this.props.toggleAddressModal,
     });
+    await this.getShopRequest();
     this.setState({ isLoaded: true });
+  };
+
+  getShopRequest = async () => {
+    let recentRegion =
+      (await AsyncStorage.getItem('recentRegion')) || '서울 강남구';
+    let shopResult = await axios.get(
+      encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`),
+    );
+    this.props.getShop([...shopResult.data]);
+  };
+
+  handleLoadMore = () => {
+    this.setState({
+      page: this.state.page + 1,
+    });
   };
 
   render() {
@@ -58,11 +85,13 @@ class Shop extends React.Component<Props, localState> {
           <View style={{ flex: 1 }}>
             <FlatList
               style={{ flex: 1 }}
-              data={fakedata}
-              keyExtractor={item => item.toString()}
-              renderItem={() => (
-                <ShopEntry navigation={this.props.navigation} />
+              data={this.props.shops.slice(0, this.state.page * 10)}
+              keyExtractor={item => item._id.toString()}
+              renderItem={({ item }) => (
+                <ShopEntry navigation={this.props.navigation} data={item} />
               )}
+              onEndReached={this.handleLoadMore}
+              onEndReachedThreshold={0}
             />
           </View>
         </View>
@@ -74,15 +103,15 @@ class Shop extends React.Component<Props, localState> {
 }
 
 const mapStateToProps = (state: AppState) => ({
-  shop: state.shop,
-  address: state.address,
-  addressModalVisible: state.addressModalVisible,
+  shops: state.shopReducer.shops,
+  address: state.shopReducer.address,
+  addressModalVisible: state.shopReducer.addressModalVisible,
 });
 
 const Connect = connect(
   mapStateToProps,
-  { toggleAddressModal },
-)(Shop);
+  { toggleAddressModal, getShop },
+)(ShopScreen);
 
 export default createStackNavigator({
   Connect,

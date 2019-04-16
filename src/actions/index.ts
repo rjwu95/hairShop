@@ -3,12 +3,12 @@ import {
   GET_SHOP,
   CHANGE_ADDRESS,
   TOGGLE_ADDRESSMODAL,
-} from '../reducers';
+} from '../reducers/types';
 
-export function getShop(newShop: Shop) {
+export function getShop(newShops: Shop[]) {
   return {
     type: GET_SHOP,
-    payload: newShop,
+    payload: newShops,
   };
 }
 

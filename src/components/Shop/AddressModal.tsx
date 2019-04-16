@@ -27,9 +27,10 @@ const AddressModal = (props: Props) => {
   );
 };
 
-const mapStateToProps = (state: AppState) => (
-  state.address, state.addressModalVisible
-);
+const mapStateToProps = (state: AppState) => ({
+  address: state.shopReducer.address,
+  addressModalVisible: state.shopReducer.addressModalVisible,
+});
 
 export default connect(
   mapStateToProps,

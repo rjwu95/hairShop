@@ -44,7 +44,7 @@ const Root = createBottomTabNavigator({
 const AppContainer = createAppContainer(Root);
 
 const mapStateToProps = (state: AppState) => ({
-  shop: state.shop,
+  shops: state.shopReducer.shops,
 });
 
 const Content = connect(
