@@ -11,19 +11,25 @@ interface Props {
 const ShopEntry = ({ navigation, data }: Props) => {
   return (
     <TouchableOpacity
-      style={{ height: 250 }}
+      style={{
+        height: data.image[0] ? 250 : 250 / 3,
+        borderBottomColor: '#dcdcdc',
+        borderBottomWidth: 0.5,
+      }}
       onPress={() =>
         navigation.navigate('ShopDetail', {
           data,
         })
       }
     >
-      <Image
-        source={{
-          uri: data.image[0],
-        }}
-        style={{ flex: 3 }}
-      />
+      {data.image[0] && (
+        <Image
+          source={{
+            uri: data.image[0],
+          }}
+          style={{ flex: 3 }}
+        />
+      )}
       <View style={styles.textContainer}>
         <View style={{ justifyContent: 'center' }}>
           <Text style={{ fontSize: 19 }}>{data.name}</Text>

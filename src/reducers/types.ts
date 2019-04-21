@@ -1,4 +1,8 @@
+export interface Menu {
+  [key: string]: Array<any>;
+}
 export interface Shop {
+  _id: string;
   name: string;
   address: string[];
   category: string;
@@ -6,7 +10,7 @@ export interface Shop {
   homepage: string;
   image: string[];
   location: { lat: number; lng: number };
-  menu: [object];
+  menu: Menu;
   openingHours: string[];
 }
 

@@ -21,6 +21,7 @@ import ShopDetail from './ShopDetail';
 import axios from 'axios';
 import { serverUrl } from '../../../config.json';
 import { AppState } from '../../store';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Props {
   toggleAddressModal: typeof toggleAddressModal;
@@ -40,8 +41,15 @@ class ShopScreen extends React.Component<Props, localState> {
     const { params = {} } = navigation.state;
     return {
       headerTitle: (
-        <TouchableOpacity onPress={params.toggleModal}>
-          <Text style={{ fontSize: 16, fontWeight: '600' }}>주소</Text>
+        <TouchableOpacity
+          onPress={params.toggleModal}
+          style={styles.headerTitle}
+        >
+          <Text style={{ fontSize: 16, fontWeight: '600' }}>
+            <Ionicons name="ios-pin" size={14} />
+            {'  주소  '}
+            <Ionicons name="ios-arrow-down" size={14} />
+          </Text>
         </TouchableOpacity>
       ),
     };
@@ -63,8 +71,7 @@ class ShopScreen extends React.Component<Props, localState> {
   };
 
   getShopRequest = async () => {
-    let recentRegion =
-      (await AsyncStorage.getItem('recentRegion')) || '서울 강남구';
+    let recentRegion = (await AsyncStorage.getItem('recentRegion')) || '팔달구';
     let shopResult = await axios.get(
       encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`),
     );
@@ -134,4 +141,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   font: { color: 'white', fontWeight: '700' },
+  headerTitle: {
+    width: '80%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

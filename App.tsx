@@ -20,28 +20,28 @@ interface tabBar {
   tintColor: string;
 }
 
-const Root = createBottomTabNavigator({
-  Shop: {
-    screen: Shop,
-    navigationOptions: {
-      tabBarLable: '헤어샵',
-      tabBarIcon: ({ tintColor }: tabBar) => (
-        <Ionicons name="ios-home" size={24} color={tintColor} />
-      ),
-    },
-  },
-  MyPage: {
-    screen: MyPage,
-    navigationOptions: {
-      tabBarLable: '마이',
-      tabBarIcon: ({ tintColor }: tabBar) => {
-        return <Ionicons name="ios-person" size={24} color={tintColor} />;
-      },
-    },
-  },
-});
+// const Root = createBottomTabNavigator({
+//   Shop: {
+//     screen: Shop,
+//     navigationOptions: {
+//       tabBarLable: '헤어샵',
+//       tabBarIcon: ({ tintColor }: tabBar) => (
+//         <Ionicons name="ios-home" size={24} color={tintColor} />
+//       ),
+//     },
+//   },
+//   MyPage: {
+//     screen: MyPage,
+//     navigationOptions: {
+//       tabBarLable: '마이',
+//       tabBarIcon: ({ tintColor }: tabBar) => {
+//         return <Ionicons name="ios-person" size={24} color={tintColor} />;
+//       },
+//     },
+//   },
+// });
 
-const AppContainer = createAppContainer(Root);
+const AppContainer = createAppContainer(Shop);
 
 const mapStateToProps = (state: AppState) => ({
   shops: state.shopReducer.shops,
