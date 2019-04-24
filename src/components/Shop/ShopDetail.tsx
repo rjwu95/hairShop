@@ -127,6 +127,7 @@ class ShopDetail extends React.Component<Props, State, any> {
         <MapDetail
           visible={this.state.mapModalVisible}
           toggleMapModal={this.toggleMapModal}
+          shops={[data]}
         />
         <TouchableOpacity
           onPress={() => this.props.navigation.goBack()}

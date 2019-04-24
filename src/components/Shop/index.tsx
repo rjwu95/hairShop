@@ -34,6 +34,7 @@ interface localState {
   isLoaded: boolean;
   modalVisible: boolean;
   page: number;
+  recentRegion: string;
 }
 
 class ShopScreen extends React.Component<Props, localState> {
@@ -47,7 +48,7 @@ class ShopScreen extends React.Component<Props, localState> {
         >
           <Text style={{ fontSize: 16, fontWeight: '600' }}>
             <Ionicons name="ios-pin" size={14} />
-            {'  주소  '}
+            {`  ${params.recentRegion}  `}
             <Ionicons name="ios-arrow-down" size={14} />
           </Text>
         </TouchableOpacity>
@@ -59,6 +60,7 @@ class ShopScreen extends React.Component<Props, localState> {
     isLoaded: false,
     modalVisible: false,
     page: 1,
+    recentRegion: '',
   };
 
   componentDidMount = async () => {
@@ -71,11 +73,21 @@ class ShopScreen extends React.Component<Props, localState> {
   };
 
   getShopRequest = async () => {
-    let recentRegion = (await AsyncStorage.getItem('recentRegion')) || '팔달구';
+    this.setState({ isLoaded: false });
+    const { navigation } = this.props;
+    let recentRegion =
+      (await AsyncStorage.getItem('recentRegion')) || '서울 강남구';
+    await this.setState({
+      recentRegion,
+    });
+    navigation.setParams({
+      recentRegion,
+    });
     let shopResult = await axios.get(
       encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`),
     );
     this.props.getShop([...shopResult.data]);
+    this.setState({ isLoaded: true });
   };
 
   handleLoadMore = () => {
@@ -87,7 +99,10 @@ class ShopScreen extends React.Component<Props, localState> {
   render() {
     return this.state.isLoaded ? (
       <>
-        <AddressModal />
+        <AddressModal
+          recentRegion={this.state.recentRegion}
+          getShopRequest={this.getShopRequest}
+        />
         <View style={styles.container}>
           <View style={{ flex: 1 }}>
             <FlatList
