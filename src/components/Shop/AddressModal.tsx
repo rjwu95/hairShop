@@ -10,11 +10,14 @@ import {
   AsyncStorage,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { toggleAddressModal } from '../../actions';
+import { toggleAddressModal, getShop } from '../../actions';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
 import { FlatList } from 'react-native-gesture-handler';
 import region from './region.json';
+import { Constants, Location, Permissions } from 'expo';
+import axios from 'axios';
+import { serverUrl } from '../../../config.json';
 
 const { height } = Dimensions.get('window');
 
@@ -23,14 +26,40 @@ interface Props {
   addressModalVisible: boolean;
   recentRegion: string;
   getShopRequest: () => void;
+  tab: string;
+  handleTab: (tab: string) => void;
+  getShop: typeof getShop;
 }
 
 const AddressModal = (props: Props) => {
   const selectRegion = async (target: string) => {
-    const newRegion =
-      region.filter(el => el.state.includes(target))[0].city + ` ${target}`;
+    const newRegion = props.tab + ` ${target}`;
     await AsyncStorage.setItem('recentRegion', newRegion);
     props.getShopRequest();
+    props.toggleAddressModal();
+  };
+
+  const getCurrentLocation = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    return location;
+    // console.log(location);
+  };
+
+  const handleCurrentButton = async () => {
+    const currentLocation = await getCurrentLocation();
+    const result = await axios.get(`${serverUrl}/api/shop/currentLocation`, {
+      headers: {
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
+      },
+    });
+    console.log(JSON.stringify(result.data));
+    props.getShop(result.data);
     props.toggleAddressModal();
   };
 
@@ -58,6 +87,7 @@ const AddressModal = (props: Props) => {
           justifyContent: 'center',
           paddingHorizontal: 20,
         }}
+        onPress={handleCurrentButton}
       >
         <Text style={{ fontSize: 18 }}>
           <Ionicons name="ios-locate" size={20} />
@@ -85,9 +115,19 @@ const AddressModal = (props: Props) => {
                     justifyContent: 'center',
                     borderBottomWidth: 0.5,
                     borderBottomColor: '#dcdcdc',
+                    backgroundColor:
+                      item === props.tab ? 'white' : 'rgba(225,225,225, 0.6)',
                   }}
+                  onPress={() => props.handleTab(item)}
                 >
-                  <Text style={{ fontSize: 17 }}>{item}</Text>
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      color: item === props.tab ? 'black' : '#a9a9a9',
+                    }}
+                  >
+                    {item}
+                  </Text>
                 </TouchableOpacity>
               )}
             />
@@ -97,11 +137,7 @@ const AddressModal = (props: Props) => {
           {
             <FlatList
               style={{ height: '100%', paddingHorizontal: 10 }}
-              data={
-                region.filter(el =>
-                  el.city.match(props.recentRegion.slice(0, 2)),
-                )[0].state
-              }
+              data={region.filter(el => el.city === props.tab)[0].state}
               keyExtractor={item => item.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -131,7 +167,7 @@ const mapStateToProps = (state: AppState) => ({
 
 export default connect(
   mapStateToProps,
-  { toggleAddressModal },
+  { toggleAddressModal, getShop },
 )(AddressModal);
 
 const styles = StyleSheet.create({

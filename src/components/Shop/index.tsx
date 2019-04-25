@@ -35,6 +35,7 @@ interface localState {
   modalVisible: boolean;
   page: number;
   recentRegion: string;
+  tab: string;
 }
 
 class ShopScreen extends React.Component<Props, localState> {
@@ -61,6 +62,7 @@ class ShopScreen extends React.Component<Props, localState> {
     modalVisible: false,
     page: 1,
     recentRegion: '',
+    tab: '',
   };
 
   componentDidMount = async () => {
@@ -80,13 +82,16 @@ class ShopScreen extends React.Component<Props, localState> {
     await this.setState({
       recentRegion,
     });
-    navigation.setParams({
+    await navigation.setParams({
       recentRegion,
     });
     let shopResult = await axios.get(
       encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`),
     );
     this.props.getShop([...shopResult.data]);
+    this.setState({
+      tab: recentRegion.slice(0, 2),
+    });
     this.setState({ isLoaded: true });
   };
 
@@ -96,12 +101,20 @@ class ShopScreen extends React.Component<Props, localState> {
     });
   };
 
+  handleTab = async (tab: string) => {
+    this.setState({
+      tab,
+    });
+  };
+
   render() {
     return this.state.isLoaded ? (
       <>
         <AddressModal
           recentRegion={this.state.recentRegion}
           getShopRequest={this.getShopRequest}
+          tab={this.state.tab}
+          handleTab={this.handleTab}
         />
         <View style={styles.container}>
           <View style={{ flex: 1 }}>
