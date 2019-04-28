@@ -6,9 +6,10 @@ import { Shop } from '../../reducers/types';
 interface Props {
   navigation: NavigationScreenProp<any, any>;
   data: Shop;
+  recentRegion: string;
 }
 
-const ShopEntry = ({ navigation, data }: Props) => {
+const ShopEntry = ({ navigation, data, recentRegion }: Props) => {
   return (
     <TouchableOpacity
       style={{
@@ -34,12 +35,22 @@ const ShopEntry = ({ navigation, data }: Props) => {
         <View style={{ justifyContent: 'center' }}>
           <Text style={{ fontSize: 19 }}>{data.name}</Text>
           <Text style={{ fontSize: 13, color: '#a9a9a9' }}>
-            응암/연신내 | 1.4km이내
+            {recentRegion.split(' ')[recentRegion.split(' ').length - 1]}
           </Text>
         </View>
         <View style={{ justifyContent: 'center' }}>
-          <Text style={{ fontSize: 12, color: '#fe6067' }}>컷트</Text>
-          <Text style={{ fontSize: 18, color: '#fe6067' }}>12,000원 ~ </Text>
+          {data.menu && Object.keys(data.menu)[0] ? (
+            <>
+              <Text style={{ fontSize: 12, color: '#fe6067' }}>컷트</Text>
+              <Text style={{ fontSize: 18, color: '#fe6067' }}>{`${
+                data.menu[Object.keys(data.menu)[0]][0].price
+              } ~ `}</Text>
+            </>
+          ) : (
+            <Text style={{ fontSize: 18, color: '#fe6067' }}>
+              가격정보 없음
+            </Text>
+          )}
         </View>
       </View>
     </TouchableOpacity>

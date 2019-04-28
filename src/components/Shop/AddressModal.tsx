@@ -10,14 +10,36 @@ import {
   AsyncStorage,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { toggleAddressModal, getShop } from '../../actions';
+import { toggleAddressModal, getShop, changeMode } from '../../actions';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
 import { FlatList } from 'react-native-gesture-handler';
 import region from './region.json';
-import { Constants, Location, Permissions } from 'expo';
 import axios from 'axios';
 import { serverUrl } from '../../../config.json';
+import { Constants, Location, Permissions } from 'expo';
+// import axios from 'axios';
+// import { serverUrl } from '../../../config.json';
+
+const convertedCity = {
+  서울특별시: '서울',
+  경기도: '경기',
+  부산광역시: '부산',
+  대구광역시: '대구',
+  인천광역시: '인천',
+  광주광역시: '광주',
+  대전광역시: '대전',
+  울산광역시: '울산',
+  강원도: '강원',
+  충청북도: '충북',
+  충청남도: '충남',
+  전라북도: '전북',
+  전라남도: '전남',
+  경상북도: '경북',
+  경상남도: '경남',
+  제주특별자치도: '제주',
+  세종특별자치시: '충남 세종',
+};
 
 const { height } = Dimensions.get('window');
 
@@ -29,10 +51,12 @@ interface Props {
   tab: string;
   handleTab: (tab: string) => void;
   getShop: typeof getShop;
+  changeMode: typeof changeMode;
 }
 
 const AddressModal = (props: Props) => {
   const selectRegion = async (target: string) => {
+    props.changeMode('region');
     const newRegion = props.tab + ` ${target}`;
     await AsyncStorage.setItem('recentRegion', newRegion);
     props.getShopRequest();
@@ -45,21 +69,28 @@ const AddressModal = (props: Props) => {
       console.log('Permission to access location was denied');
     }
 
-    let location = await Location.getCurrentPositionAsync({});
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: 0,
+    });
     return location;
-    // console.log(location);
   };
 
   const handleCurrentButton = async () => {
+    props.changeMode('current');
     const currentLocation = await getCurrentLocation();
-    const result = await axios.get(`${serverUrl}/api/shop/currentLocation`, {
-      headers: {
-        latitude: currentLocation.coords.latitude,
-        longitude: currentLocation.coords.longitude,
+    const convertLocation = await axios.get(
+      `${serverUrl}/api/shop/convertLocation`,
+      {
+        headers: {
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        },
       },
-    });
-    console.log(JSON.stringify(result.data));
-    props.getShop(result.data);
+    );
+    let convertLocationArr = convertLocation.data.split(' ');
+    convertLocationArr[0] = convertedCity[convertLocationArr[0]];
+    await AsyncStorage.setItem('recentRegion', convertLocationArr.join(' '));
+    props.getShopRequest();
     props.toggleAddressModal();
   };
 
@@ -167,7 +198,7 @@ const mapStateToProps = (state: AppState) => ({
 
 export default connect(
   mapStateToProps,
-  { toggleAddressModal, getShop },
+  { toggleAddressModal, getShop, changeMode },
 )(AddressModal);
 
 const styles = StyleSheet.create({

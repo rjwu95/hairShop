@@ -18,11 +18,13 @@ export interface ShopState {
   shops: Shop[];
   address: string;
   addressModalVisible: boolean;
+  mode: string;
 }
 
 export const GET_SHOP = 'GET_SHOP';
 export const CHANGE_ADDRESS = 'CHANGE_ADDRESS';
 export const TOGGLE_ADDRESSMODAL = 'TOGGLE_ADDRESSMODAL';
+export const CHANGE_MODE = 'CHANGE_MODE';
 
 export interface GetShopAction {
   type: typeof GET_SHOP;
@@ -36,4 +38,9 @@ export interface ChangeAddress {
 
 export interface ToggleAddressModal {
   type: typeof TOGGLE_ADDRESSMODAL;
+}
+
+export interface ChangeMode {
+  type: typeof CHANGE_MODE;
+  payload: string;
 }

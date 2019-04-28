@@ -3,6 +3,7 @@ import {
   GET_SHOP,
   CHANGE_ADDRESS,
   TOGGLE_ADDRESSMODAL,
+  CHANGE_MODE,
 } from '../reducers/types';
 
 export function getShop(newShops: Shop[]) {
@@ -22,5 +23,12 @@ export function changeAddress(newAddress: string) {
 export function toggleAddressModal() {
   return {
     type: TOGGLE_ADDRESSMODAL,
+  };
+}
+
+export function changeMode(mode: string) {
+  return {
+    type: CHANGE_MODE,
+    payload: mode,
   };
 }

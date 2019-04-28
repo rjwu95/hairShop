@@ -22,12 +22,14 @@ import axios from 'axios';
 import { serverUrl } from '../../../config.json';
 import { AppState } from '../../store';
 import { Ionicons } from '@expo/vector-icons';
+import { Permissions, Location } from 'expo';
 
 interface Props {
   toggleAddressModal: typeof toggleAddressModal;
   navigation: NavigationScreenProp<any, any>;
   shops: Shop[];
   getShop: typeof getShop;
+  mode: string;
 }
 
 interface localState {
@@ -85,14 +87,37 @@ class ShopScreen extends React.Component<Props, localState> {
     await navigation.setParams({
       recentRegion,
     });
-    let shopResult = await axios.get(
-      encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`),
-    );
+    let shopResult;
+    if (this.props.mode === 'region') {
+      shopResult = await axios.get(
+        encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`),
+      );
+    } else {
+      const currentLocation = await this.getCurrentLocation();
+      shopResult = await axios.get(`${serverUrl}/api/shop/currentLocation`, {
+        headers: {
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        },
+      });
+    }
     this.props.getShop([...shopResult.data]);
     this.setState({
       tab: recentRegion.slice(0, 2),
     });
     this.setState({ isLoaded: true });
+  };
+
+  getCurrentLocation = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+    }
+
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: 0,
+    });
+    return location;
   };
 
   handleLoadMore = () => {
@@ -123,10 +148,13 @@ class ShopScreen extends React.Component<Props, localState> {
               data={this.props.shops.slice(0, this.state.page * 10)}
               keyExtractor={item => item._id.toString()}
               renderItem={({ item }) => (
-                <ShopEntry navigation={this.props.navigation} data={item} />
+                <ShopEntry
+                  navigation={this.props.navigation}
+                  data={item}
+                  recentRegion={this.state.recentRegion}
+                />
               )}
               onEndReached={this.handleLoadMore}
-              onEndReachedThreshold={0}
             />
           </View>
         </View>
@@ -141,6 +169,7 @@ const mapStateToProps = (state: AppState) => ({
   shops: state.shopReducer.shops,
   address: state.shopReducer.address,
   addressModalVisible: state.shopReducer.addressModalVisible,
+  mode: state.shopReducer.mode,
 });
 
 const Connect = connect(

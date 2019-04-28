@@ -36,9 +36,24 @@ const Banner = ({ data }: bannerProps) => (
     autoplay
     showsPagination={false}
   >
-    {data.image.map((el, i) => (
+    {data.image.length ? (
+      data.image.map((el, i) => (
+        <View
+          key={i.toString()}
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white',
+          }}
+        >
+          <ImageBackground
+            source={{ uri: el }}
+            style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+          />
+        </View>
+      ))
+    ) : (
       <View
-        key={i.toString()}
         style={{
           justifyContent: 'center',
           alignItems: 'center',
@@ -46,11 +61,11 @@ const Banner = ({ data }: bannerProps) => (
         }}
       >
         <ImageBackground
-          source={{ uri: el }}
+          source={require('../../../nonImage.jpg')}
           style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
         />
       </View>
-    ))}
+    )}
   </Swiper>
 );
 
@@ -66,7 +81,7 @@ const priceEntry = (menu: Menu) =>
             '대표',
             '',
           )}  `}</Text>
-          <Text style={{ color: '#dcdcdc' }}>------------------</Text>
+          <Text style={{ color: '#dcdcdc' }}>-----------</Text>
           <Text style={{ color: '#696969', fontWeight: 'bold' }}>
             {`  ${ele.price}`}
           </Text>
@@ -236,7 +251,7 @@ class ShopDetail extends React.Component<Props, State, any> {
               {data.address.length ||
               data.homepage ||
               data.openingHours.length ? (
-                <View style={{ paddingHorizontal: 20 }}>
+                <View style={{ paddingHorizontal: 20, paddingTop: 15 }}>
                   <Text style={{ fontSize: 15, color: '#696969', height: 30 }}>
                     매장정보
                   </Text>
@@ -268,12 +283,7 @@ class ShopDetail extends React.Component<Props, State, any> {
                     </TouchableOpacity>
                   ) : null}
                   {data.contact ? (
-                    <View
-                      style={[
-                        styles.contactInfoContainer,
-                        { backgroundColor: 'red' },
-                      ]}
-                    >
+                    <View style={styles.contactInfoContainer}>
                       <View
                         style={{
                           justifyContent: 'center',
@@ -293,12 +303,7 @@ class ShopDetail extends React.Component<Props, State, any> {
                     </View>
                   ) : null}
                   {data.openingHours.length ? (
-                    <View
-                      style={[
-                        styles.contactInfoContainer,
-                        { backgroundColor: 'blue' },
-                      ]}
-                    >
+                    <View style={styles.contactInfoContainer}>
                       <View
                         style={{
                           width: 80,
@@ -314,12 +319,7 @@ class ShopDetail extends React.Component<Props, State, any> {
                     </View>
                   ) : null}
                   {data.homepage ? (
-                    <View
-                      style={[
-                        styles.contactInfoContainer,
-                        { backgroundColor: 'yellow' },
-                      ]}
-                    >
+                    <View style={styles.contactInfoContainer}>
                       <View
                         style={{
                           width: 80,

@@ -31,28 +31,29 @@ const MapDetail = ({ visible, toggleMapModal, shops }: Props) => {
       >
         <View
           style={{
-            height: 80,
+            height: 75,
             paddingHorizontal: 20,
             justifyContent: 'space-between',
             flexDirection: 'row',
-            backgroundColor: 'blue',
-            paddingTop: 35,
+            paddingTop: 25,
             alignItems: 'center',
+            backgroundColor: 'white',
+            borderBottomColor: '#dcdcdc',
+            borderBottomWidth: 0.5,
           }}
         >
-          <Text style={{ fontSize: 25, backgroundColor: 'yellow' }}>
-            SampleTitle
+          <Text style={{ fontSize: 20, fontWeight: '500' }}>
+            {shops[0].name}
           </Text>
           <TouchableOpacity
             onPress={toggleMapModal}
-            style={{ backgroundColor: 'brown' }}
+            style={{
+              width: 80,
+              alignItems: 'flex-end',
+            }}
           >
             <Text>
-              <Ionicons
-                name="ios-close"
-                size={30}
-                style={{ backgroundColor: 'red' }}
-              />
+              <Ionicons name="ios-close" size={30} />
             </Text>
           </TouchableOpacity>
         </View>

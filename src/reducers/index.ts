@@ -6,17 +6,20 @@ import {
   CHANGE_ADDRESS,
   ToggleAddressModal,
   TOGGLE_ADDRESSMODAL,
+  ChangeMode,
+  CHANGE_MODE,
 } from './types';
 
 const initialState: ShopState = {
   shops: [],
   address: '',
   addressModalVisible: false,
+  mode: 'region',
 };
 
 export function shopReducer(
   state = initialState,
-  action: GetShopAction | ChangeAddress | ToggleAddressModal,
+  action: GetShopAction | ChangeAddress | ToggleAddressModal | ChangeMode,
 ): ShopState {
   switch (action.type) {
     case GET_SHOP:
@@ -33,6 +36,11 @@ export function shopReducer(
       return {
         ...state,
         addressModalVisible: !state.addressModalVisible,
+      };
+    case CHANGE_MODE:
+      return {
+        ...state,
+        mode: action.payload,
       };
     default:
       return state;
