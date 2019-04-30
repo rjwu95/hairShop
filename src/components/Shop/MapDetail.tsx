@@ -1,8 +1,17 @@
 import * as React from 'react';
-import { StyleSheet, Modal, View, Text, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { Shop } from '../../reducers/types';
+
+const { height } = Dimensions.get('window');
 
 interface Props {
   visible: boolean;
@@ -17,8 +26,32 @@ const MapDetail = ({ visible, toggleMapModal, shops }: Props) => {
       onRequestClose={toggleMapModal}
       visible={visible}
     >
+      <View
+        style={{
+          height: 75,
+          paddingHorizontal: 20,
+          justifyContent: 'space-between',
+          flexDirection: 'row',
+          paddingTop: 25,
+          alignItems: 'center',
+          backgroundColor: 'white',
+          borderBottomColor: '#dcdcdc',
+          borderBottomWidth: 0.5,
+        }}
+      >
+        <Text style={{ fontSize: 20, fontWeight: '500' }}>{shops[0].name}</Text>
+        <TouchableOpacity
+          onPress={toggleMapModal}
+          style={{
+            width: 80,
+            alignItems: 'flex-end',
+          }}
+        >
+          <Ionicons name="ios-close" size={30} />
+        </TouchableOpacity>
+      </View>
       <MapView
-        style={StyleSheet.absoluteFill}
+        style={{ height: height - 75 }}
         region={{
           latitude: shops[0].location.lat,
           longitude: shops[0].location.lng,
@@ -29,34 +62,6 @@ const MapDetail = ({ visible, toggleMapModal, shops }: Props) => {
         showsUserLocation
         showsMyLocationButton={true}
       >
-        <View
-          style={{
-            height: 75,
-            paddingHorizontal: 20,
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-            paddingTop: 25,
-            alignItems: 'center',
-            backgroundColor: 'white',
-            borderBottomColor: '#dcdcdc',
-            borderBottomWidth: 0.5,
-          }}
-        >
-          <Text style={{ fontSize: 20, fontWeight: '500' }}>
-            {shops[0].name}
-          </Text>
-          <TouchableOpacity
-            onPress={toggleMapModal}
-            style={{
-              width: 80,
-              alignItems: 'flex-end',
-            }}
-          >
-            <Text>
-              <Ionicons name="ios-close" size={30} />
-            </Text>
-          </TouchableOpacity>
-        </View>
         {shops.map(el => (
           <Marker
             coordinate={{
