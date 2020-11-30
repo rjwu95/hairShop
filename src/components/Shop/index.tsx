@@ -160,7 +160,7 @@ class ShopScreen extends React.Component<Props, localState> {
         </View>
       </>
     ) : (
-      <Text>loding</Text>
+      <Text>...loading</Text>
     );
   }
 }
