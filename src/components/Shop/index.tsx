@@ -134,6 +134,7 @@ class ShopScreen extends React.Component<Props, localState> {
 
   render() {
     return this.state.isLoaded ? (
+      
       <>
         <AddressModal
           recentRegion={this.state.recentRegion}
@@ -141,6 +142,8 @@ class ShopScreen extends React.Component<Props, localState> {
           tab={this.state.tab}
           handleTab={this.handleTab}
         />
+        {this.props.shops.length === 0 ?
+          <Text>해당 지역에 미용실 정보가 없습니다.</Text> :
         <View style={styles.container}>
           <View style={{ flex: 1 }}>
             <FlatList
@@ -157,7 +160,7 @@ class ShopScreen extends React.Component<Props, localState> {
               onEndReached={this.handleLoadMore}
             />
           </View>
-        </View>
+        </View>}
       </>
     ) : (
       <Text>...loading</Text>
