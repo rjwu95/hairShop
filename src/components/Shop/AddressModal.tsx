@@ -8,18 +8,16 @@ import {
   TouchableOpacity,
   Dimensions,
   AsyncStorage,
+  FlatList
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { toggleAddressModal, getShop, changeMode } from '../../actions';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
-import { FlatList } from 'react-native-gesture-handler';
 import region from './region.json';
 import axios from 'axios';
 import { serverUrl } from '../../../config.json';
-import { Constants, Location, Permissions } from 'expo';
-// import axios from 'axios';
-// import { serverUrl } from '../../../config.json';
+import { Location, Permissions } from 'expo';
 
 const convertedCity = {
   서울특별시: '서울',
