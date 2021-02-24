@@ -1,34 +1,30 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   AsyncStorage,
-} from 'react-native';
+} from "react-native";
 import {
   createStackNavigator,
   NavigationScreenProp,
   FlatList,
-} from 'react-navigation';
-// import { Ionicons } from '@expo/vector-icons';
-import AddressModal from './AddressModal';
-import { Shop } from '../../reducers/types';
-import { toggleAddressModal, getShop } from '../../actions';
-import { connect } from 'react-redux';
-import ShopEntry from './ShopEntry';
-import ShopDetail from './ShopDetail';
-import axios from 'axios';
-import { serverUrl } from '../../../config.json';
-import { AppState } from '../../store';
-import { Ionicons } from '@expo/vector-icons';
-import { Permissions, Location } from 'expo';
+} from "react-navigation";
+import AddressModal from "./AddressModal";
+import { Shop } from "../../reducers/types";
+import ShopEntry from "./ShopEntry";
+import ShopDetail from "./ShopDetail";
+import axios from "axios";
+import { serverUrl } from "../../../config.json";
+import { Ionicons } from "@expo/vector-icons";
+import { Permissions, Location } from "expo";
+import store from "../../store";
+import { getShop } from "../../reducers/shopSlice";
 
 interface Props {
-  toggleAddressModal: typeof toggleAddressModal;
   navigation: NavigationScreenProp<any, any>;
   shops: Shop[];
-  getShop: typeof getShop;
   mode: string;
 }
 
@@ -49,7 +45,7 @@ class ShopScreen extends React.Component<Props, localState> {
           onPress={params.toggleModal}
           style={styles.headerTitle}
         >
-          <Text style={{ fontSize: 16, fontWeight: '600' }}>
+          <Text style={{ fontSize: 16, fontWeight: "600" }}>
             <Ionicons name="ios-pin" size={14} />
             {`  ${params.recentRegion}  `}
             <Ionicons name="ios-arrow-down" size={14} />
@@ -63,14 +59,14 @@ class ShopScreen extends React.Component<Props, localState> {
     isLoaded: false,
     modalVisible: false,
     page: 1,
-    recentRegion: '',
-    tab: '',
+    recentRegion: "",
+    tab: "",
   };
 
   componentDidMount = async () => {
     const { navigation } = this.props;
     navigation.setParams({
-      toggleModal: this.props.toggleAddressModal,
+      toggleModal: store.getState().address.modal,
     });
     await this.getShopRequest();
     this.setState({ isLoaded: true });
@@ -80,7 +76,7 @@ class ShopScreen extends React.Component<Props, localState> {
     this.setState({ isLoaded: false });
     const { navigation } = this.props;
     let recentRegion =
-      (await AsyncStorage.getItem('recentRegion')) || '서울 강남구';
+      (await AsyncStorage.getItem("recentRegion")) || "서울 강남구";
     await this.setState({
       recentRegion,
     });
@@ -88,9 +84,9 @@ class ShopScreen extends React.Component<Props, localState> {
       recentRegion,
     });
     let shopResult;
-    if (this.props.mode === 'region') {
+    if (store.getState().mode === "region") {
       shopResult = await axios.get(
-        encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`),
+        encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`)
       );
     } else {
       const currentLocation = await this.getCurrentLocation();
@@ -101,7 +97,7 @@ class ShopScreen extends React.Component<Props, localState> {
         },
       });
     }
-    this.props.getShop([...shopResult.data]);
+    store.dispatch(getShop([...shopResult.data]));
     this.setState({
       tab: recentRegion.slice(0, 2),
     });
@@ -110,8 +106,8 @@ class ShopScreen extends React.Component<Props, localState> {
 
   getCurrentLocation = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      console.log('Permission to access location was denied');
+    if (status !== "granted") {
+      console.log("Permission to access location was denied");
     }
 
     let location = await Location.getCurrentPositionAsync({
@@ -134,7 +130,6 @@ class ShopScreen extends React.Component<Props, localState> {
 
   render() {
     return this.state.isLoaded ? (
-      
       <>
         <AddressModal
           recentRegion={this.state.recentRegion}
@@ -142,25 +137,27 @@ class ShopScreen extends React.Component<Props, localState> {
           tab={this.state.tab}
           handleTab={this.handleTab}
         />
-        {this.props.shops.length === 0 ?
-          <Text>해당 지역에 미용실 정보가 없습니다.</Text> :
-        <View style={styles.container}>
-          <View style={{ flex: 1 }}>
-            <FlatList
-              style={{ flex: 1 }}
-              data={this.props.shops.slice(0, this.state.page * 10)}
-              keyExtractor={item => item._id.toString()}
-              renderItem={({ item }) => (
-                <ShopEntry
-                  navigation={this.props.navigation}
-                  data={item}
-                  recentRegion={this.state.recentRegion}
-                />
-              )}
-              onEndReached={this.handleLoadMore}
-            />
+        {store.getState().shop.length === 0 ? (
+          <Text>해당 지역에 미용실 정보가 없습니다.</Text>
+        ) : (
+          <View style={styles.container}>
+            <View style={{ flex: 1 }}>
+              <FlatList
+                style={{ flex: 1 }}
+                data={store.getState().shop.slice(0, this.state.page * 10)}
+                keyExtractor={(item) => item._id.toString()}
+                renderItem={({ item }) => (
+                  <ShopEntry
+                    navigation={this.props.navigation}
+                    data={item}
+                    recentRegion={this.state.recentRegion}
+                  />
+                )}
+                onEndReached={this.handleLoadMore}
+              />
+            </View>
           </View>
-        </View>}
+        )}
       </>
     ) : (
       <Text>...loading</Text>
@@ -168,43 +165,31 @@ class ShopScreen extends React.Component<Props, localState> {
   }
 }
 
-const mapStateToProps = (state: AppState) => ({
-  shops: state.shopReducer.shops,
-  address: state.shopReducer.address,
-  addressModalVisible: state.shopReducer.addressModalVisible,
-  mode: state.shopReducer.mode,
-});
-
-const Connect = connect(
-  mapStateToProps,
-  { toggleAddressModal, getShop },
-)(ShopScreen);
-
 export default createStackNavigator({
-  Connect,
+  ShopScreen,
   ShopDetail,
 });
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
   button: {
-    backgroundColor: '#DB7093',
+    backgroundColor: "#DB7093",
     margin: 10,
-    justifyContent: 'center',
-    height: '15%',
+    justifyContent: "center",
+    height: "15%",
     padding: 10,
   },
-  font: { color: 'white', fontWeight: '700' },
+  font: { color: "white", fontWeight: "700" },
   headerTitle: {
-    width: '80%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "80%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
