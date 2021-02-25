@@ -12,7 +12,6 @@ import {
   FlatList,
 } from "react-navigation";
 import AddressModal from "./AddressModal";
-import { Shop } from "../../reducers/types";
 import ShopEntry from "./ShopEntry";
 import ShopDetail from "./ShopDetail";
 import axios from "axios";
@@ -21,10 +20,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { Permissions, Location } from "expo";
 import store from "../../store";
 import { getShop } from "../../reducers/shopSlice";
+import { toggleAddressModal } from "../../reducers/addressSlice";
 
 interface Props {
   navigation: NavigationScreenProp<any, any>;
-  shops: Shop[];
   mode: string;
 }
 
@@ -66,7 +65,7 @@ class ShopScreen extends React.Component<Props, localState> {
   componentDidMount = async () => {
     const { navigation } = this.props;
     navigation.setParams({
-      toggleModal: store.getState().address.modal,
+      toggleModal: () => store.dispatch(toggleAddressModal()),
     });
     await this.getShopRequest();
     this.setState({ isLoaded: true });
@@ -84,7 +83,7 @@ class ShopScreen extends React.Component<Props, localState> {
       recentRegion,
     });
     let shopResult;
-    if (store.getState().mode === "region") {
+    if (store.getState().mode.value === "region") {
       shopResult = await axios.get(
         encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`)
       );
@@ -137,14 +136,16 @@ class ShopScreen extends React.Component<Props, localState> {
           tab={this.state.tab}
           handleTab={this.handleTab}
         />
-        {store.getState().shop.length === 0 ? (
+        {store.getState().shop.value.length === 0 ? (
           <Text>해당 지역에 미용실 정보가 없습니다.</Text>
         ) : (
           <View style={styles.container}>
             <View style={{ flex: 1 }}>
               <FlatList
                 style={{ flex: 1 }}
-                data={store.getState().shop.slice(0, this.state.page * 10)}
+                data={store
+                  .getState()
+                  .shop.value.slice(0, this.state.page * 10)}
                 keyExtractor={(item) => item._id.toString()}
                 renderItem={({ item }) => (
                   <ShopEntry

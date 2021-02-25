@@ -3,16 +3,6 @@ import { useDispatch } from "react-redux";
 import addressSlice from "../reducers/addressSlice";
 import modeSlice from "../reducers/modeSlice";
 import shopSlice from "../reducers/shopSlice";
-import { Shop } from "../reducers/types";
-
-export type Store = {
-  address: {
-    modal: boolean;
-    value: string;
-  };
-  shop: Shop[];
-  mode: "region" | "current";
-};
 
 const store = configureStore({
   reducer: {

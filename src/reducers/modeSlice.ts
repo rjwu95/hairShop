@@ -1,21 +1,29 @@
 import { CaseReducer, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type Mode = "region" | "current";
+export type Mode = "region" | "current";
+export type ModeSlice = {
+  value: Mode;
+};
 
-export const changeMode: CaseReducer<Mode, PayloadAction<Mode>> = (
+const changeModeReducer: CaseReducer<ModeSlice, PayloadAction<Mode>> = (
   state,
   { payload }
 ) => {
-  state = payload;
+  console.log("reducer!!!!!");
+  state.value = payload;
 };
-const initialState: Mode = "region";
+const initialState: ModeSlice = {
+  value: "region",
+};
 
 const modeSlice = createSlice({
   name: "mode",
   initialState,
   reducers: {
-    changeMode,
+    changeMode: changeModeReducer,
   },
 });
+
+export const { changeMode } = modeSlice.actions;
 
 export default modeSlice.reducer;

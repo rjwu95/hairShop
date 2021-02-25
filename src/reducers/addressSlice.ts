@@ -5,13 +5,15 @@ export type Address = {
   modal: boolean;
 };
 
-export const changeAddress: CaseReducer<Address, PayloadAction<string>> = (
+const changeAddressReducer: CaseReducer<Address, PayloadAction<string>> = (
   state,
   { payload }
 ) => {
+  console.log("reducer!!!!!");
   state.value = payload;
 };
-export const toggleAddressModal: CaseReducer<Address> = (state) => {
+const toggleAddressModalReducer: CaseReducer<Address> = (state) => {
+  console.log("reducer!!!!!");
   state.modal = !state.modal;
 };
 
@@ -22,9 +24,11 @@ export const addressSlice = createSlice({
     modal: false,
   },
   reducers: {
-    changeAddress,
-    toggleAddressModal,
+    changeAddress: changeAddressReducer,
+    toggleAddressModal: toggleAddressModalReducer,
   },
 });
+
+export const { changeAddress, toggleAddressModal } = addressSlice.actions;
 
 export default addressSlice.reducer;

@@ -18,7 +18,7 @@ import { Location, Permissions } from "expo";
 import { changeMode } from "../../reducers/modeSlice";
 import { toggleAddressModal } from "../../reducers/addressSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { Store } from "../../store";
+import { RootState } from "../../store";
 
 const convertedCity = {
   서울특별시: "서울",
@@ -50,14 +50,14 @@ interface Props {
 }
 
 const AddressModal = (props: Props) => {
-  const address = useSelector((state: Store) => state.address);
+  const address = useSelector((state: RootState) => state.address);
   const dispatch = useDispatch();
   const selectRegion = async (target: string) => {
     dispatch(changeMode("region"));
     const newRegion = props.tab + ` ${target}`;
     await AsyncStorage.setItem("recentRegion", newRegion);
     props.getShopRequest();
-    toggleAddressModal();
+    dispatch(toggleAddressModal());
   };
 
   const getCurrentLocation = async () => {
@@ -88,7 +88,7 @@ const AddressModal = (props: Props) => {
     convertLocationArr[0] = convertedCity[convertLocationArr[0]];
     await AsyncStorage.setItem("recentRegion", convertLocationArr.join(" "));
     props.getShopRequest();
-    toggleAddressModal();
+    dispatch(toggleAddressModal());
   };
 
   return (
@@ -96,12 +96,12 @@ const AddressModal = (props: Props) => {
       animationType="slide"
       transparent={false}
       visible={address.modal}
-      onRequestClose={toggleAddressModal}
+      onRequestClose={() => dispatch(toggleAddressModal())}
     >
       <View style={styles.header}>
         <Text style={{ fontSize: 22, fontWeight: "600" }}>지역 선택</Text>
         <TouchableHighlight
-          onPress={toggleAddressModal}
+          onPress={() => dispatch(toggleAddressModal())}
           style={{ width: 80, alignItems: "flex-end" }}
         >
           <Ionicons name="ios-close" size={40} />
