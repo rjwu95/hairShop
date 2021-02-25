@@ -1,17 +1,10 @@
-import * as React from 'react';
-import {
-  StyleSheet,
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
-import { Ionicons } from '@expo/vector-icons';
-import { Shop } from '../../reducers/types';
+import * as React from "react";
+import { Modal, View, Text, TouchableOpacity, Dimensions } from "react-native";
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons";
+import { Shop } from "../../reducers/shopSlice";
 
-const { height } = Dimensions.get('window');
+const { height } = Dimensions.get("window");
 
 interface Props {
   visible: boolean;
@@ -30,21 +23,21 @@ const MapDetail = ({ visible, toggleMapModal, shops }: Props) => {
         style={{
           height: 75,
           paddingHorizontal: 20,
-          justifyContent: 'space-between',
-          flexDirection: 'row',
+          justifyContent: "space-between",
+          flexDirection: "row",
           paddingTop: 25,
-          alignItems: 'center',
-          backgroundColor: 'white',
-          borderBottomColor: '#dcdcdc',
+          alignItems: "center",
+          backgroundColor: "white",
+          borderBottomColor: "#dcdcdc",
           borderBottomWidth: 0.5,
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: '500' }}>{shops[0].name}</Text>
+        <Text style={{ fontSize: 20, fontWeight: "500" }}>{shops[0].name}</Text>
         <TouchableOpacity
           onPress={toggleMapModal}
           style={{
             width: 80,
-            alignItems: 'flex-end',
+            alignItems: "flex-end",
           }}
         >
           <Ionicons name="ios-close" size={30} />
@@ -62,7 +55,7 @@ const MapDetail = ({ visible, toggleMapModal, shops }: Props) => {
         showsUserLocation
         showsMyLocationButton={true}
       >
-        {shops.map(el => (
+        {shops.map((el) => (
           <Marker
             coordinate={{
               latitude: el.location.lat,

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   Modal,
   TouchableHighlight,
@@ -8,63 +8,62 @@ import {
   TouchableOpacity,
   Dimensions,
   AsyncStorage,
-  FlatList
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { toggleAddressModal, getShop, changeMode } from '../../actions';
-import { AppState } from '../../store';
-import { connect } from 'react-redux';
-import region from './region.json';
-import axios from 'axios';
-import { serverUrl } from '../../../config.json';
-import { Location, Permissions } from 'expo';
+  FlatList,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import region from "./region.json";
+import axios from "axios";
+import { serverUrl } from "../../../config.json";
+import { Location, Permissions } from "expo";
+import { changeMode } from "../../reducers/modeSlice";
+import { toggleAddressModal } from "../../reducers/addressSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 const convertedCity = {
-  서울특별시: '서울',
-  경기도: '경기',
-  부산광역시: '부산',
-  대구광역시: '대구',
-  인천광역시: '인천',
-  광주광역시: '광주',
-  대전광역시: '대전',
-  울산광역시: '울산',
-  강원도: '강원',
-  충청북도: '충북',
-  충청남도: '충남',
-  전라북도: '전북',
-  전라남도: '전남',
-  경상북도: '경북',
-  경상남도: '경남',
-  제주특별자치도: '제주',
-  세종특별자치시: '충남 세종',
+  서울특별시: "서울",
+  경기도: "경기",
+  부산광역시: "부산",
+  대구광역시: "대구",
+  인천광역시: "인천",
+  광주광역시: "광주",
+  대전광역시: "대전",
+  울산광역시: "울산",
+  강원도: "강원",
+  충청북도: "충북",
+  충청남도: "충남",
+  전라북도: "전북",
+  전라남도: "전남",
+  경상북도: "경북",
+  경상남도: "경남",
+  제주특별자치도: "제주",
+  세종특별자치시: "충남 세종",
 };
 
-const { height } = Dimensions.get('window');
+const { height } = Dimensions.get("window");
 
 interface Props {
-  toggleAddressModal: typeof toggleAddressModal;
-  addressModalVisible: boolean;
   recentRegion: string;
   getShopRequest: () => void;
   tab: string;
   handleTab: (tab: string) => void;
-  getShop: typeof getShop;
-  changeMode: typeof changeMode;
 }
 
 const AddressModal = (props: Props) => {
+  const address = useSelector((state: RootState) => state.address);
+  const dispatch = useDispatch();
   const selectRegion = async (target: string) => {
-    props.changeMode('region');
+    dispatch(changeMode("region"));
     const newRegion = props.tab + ` ${target}`;
-    await AsyncStorage.setItem('recentRegion', newRegion);
+    await AsyncStorage.setItem("recentRegion", newRegion);
     props.getShopRequest();
-    props.toggleAddressModal();
+    dispatch(toggleAddressModal());
   };
 
   const getCurrentLocation = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      console.log('Permission to access location was denied');
+    if (status !== "granted") {
+      console.log("Permission to access location was denied");
     }
 
     let location = await Location.getCurrentPositionAsync({
@@ -74,7 +73,7 @@ const AddressModal = (props: Props) => {
   };
 
   const handleCurrentButton = async () => {
-    props.changeMode('current');
+    dispatch(changeMode("current"));
     const currentLocation = await getCurrentLocation();
     const convertLocation = await axios.get(
       `${serverUrl}/api/shop/convertLocation`,
@@ -83,27 +82,27 @@ const AddressModal = (props: Props) => {
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
         },
-      },
+      }
     );
-    let convertLocationArr = convertLocation.data.split(' ');
+    let convertLocationArr = convertLocation.data.split(" ");
     convertLocationArr[0] = convertedCity[convertLocationArr[0]];
-    await AsyncStorage.setItem('recentRegion', convertLocationArr.join(' '));
+    await AsyncStorage.setItem("recentRegion", convertLocationArr.join(" "));
     props.getShopRequest();
-    props.toggleAddressModal();
+    dispatch(toggleAddressModal());
   };
 
   return (
     <Modal
       animationType="slide"
       transparent={false}
-      visible={props.addressModalVisible}
-      onRequestClose={props.toggleAddressModal}
+      visible={address.modal}
+      onRequestClose={() => dispatch(toggleAddressModal())}
     >
       <View style={styles.header}>
-        <Text style={{ fontSize: 22, fontWeight: '600' }}>지역 선택</Text>
+        <Text style={{ fontSize: 22, fontWeight: "600" }}>지역 선택</Text>
         <TouchableHighlight
-          onPress={props.toggleAddressModal}
-          style={{ width: 80, alignItems: 'flex-end' }}
+          onPress={() => dispatch(toggleAddressModal())}
+          style={{ width: 80, alignItems: "flex-end" }}
         >
           <Ionicons name="ios-close" size={40} />
         </TouchableHighlight>
@@ -112,8 +111,8 @@ const AddressModal = (props: Props) => {
         style={{
           height: 70,
           borderBottomWidth: 8,
-          borderBottomColor: '#dcdcdc',
-          justifyContent: 'center',
+          borderBottomColor: "#dcdcdc",
+          justifyContent: "center",
           paddingHorizontal: 20,
         }}
         onPress={handleCurrentButton}
@@ -123,36 +122,36 @@ const AddressModal = (props: Props) => {
           {`  현재 내 주변 기준으로 보기`}
         </Text>
       </TouchableOpacity>
-      <View style={{ height: height - 150, flexDirection: 'row' }}>
+      <View style={{ height: height - 150, flexDirection: "row" }}>
         <View
           style={{
-            width: '34%',
-            borderRightColor: '#dcdcdc',
+            width: "34%",
+            borderRightColor: "#dcdcdc",
             borderRightWidth: 0.5,
           }}
         >
           {
             <FlatList
-              style={{ height: '100%' }}
-              data={region.map(el => el.city)}
-              keyExtractor={item => item.toString()}
+              style={{ height: "100%" }}
+              data={region.map((el) => el.city)}
+              keyExtractor={(item) => item.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={{
                     height: 50,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: "center",
+                    justifyContent: "center",
                     borderBottomWidth: 0.5,
-                    borderBottomColor: '#dcdcdc',
+                    borderBottomColor: "#dcdcdc",
                     backgroundColor:
-                      item === props.tab ? 'white' : 'rgba(225,225,225, 0.6)',
+                      item === props.tab ? "white" : "rgba(225,225,225, 0.6)",
                   }}
                   onPress={() => props.handleTab(item)}
                 >
                   <Text
                     style={{
                       fontSize: 17,
-                      color: item === props.tab ? 'black' : '#a9a9a9',
+                      color: item === props.tab ? "black" : "#a9a9a9",
                     }}
                   >
                     {item}
@@ -162,19 +161,19 @@ const AddressModal = (props: Props) => {
             />
           }
         </View>
-        <View style={{ width: '66%', paddingHorizontal: 10 }}>
+        <View style={{ width: "66%", paddingHorizontal: 10 }}>
           {
             <FlatList
-              style={{ height: '100%', paddingHorizontal: 10 }}
-              data={region.filter(el => el.city === props.tab)[0].state}
-              keyExtractor={item => item.toString()}
+              style={{ height: "100%", paddingHorizontal: 10 }}
+              data={region.filter((el) => el.city === props.tab)[0].state}
+              keyExtractor={(item) => item.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={{
                     height: 50,
-                    justifyContent: 'center',
+                    justifyContent: "center",
                     borderBottomWidth: 0.5,
-                    borderBottomColor: '#dcdcdc',
+                    borderBottomColor: "#dcdcdc",
                   }}
                   onPress={() => selectRegion(item)}
                 >
@@ -189,25 +188,17 @@ const AddressModal = (props: Props) => {
   );
 };
 
-const mapStateToProps = (state: AppState) => ({
-  address: state.shopReducer.address,
-  addressModalVisible: state.shopReducer.addressModalVisible,
-});
-
-export default connect(
-  mapStateToProps,
-  { toggleAddressModal, getShop, changeMode },
-)(AddressModal);
-
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 80,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#dcdcdc',
+    borderBottomColor: "#dcdcdc",
     paddingTop: 30,
     paddingHorizontal: 20,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
+
+export default AddressModal;

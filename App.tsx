@@ -1,14 +1,12 @@
-import * as React from 'react';
+import * as React from "react";
 // import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { AppState } from './src/store';
-import { connect, Provider } from 'react-redux';
+import { Provider } from "react-redux";
 // import { Ionicons } from '@expo/vector-icons';
 
-import store from './src/store';
+import store from "./src/store";
 // import { State } from './src/reducers';
-import { getShop } from './src/actions';
-import { createBottomTabNavigator, createAppContainer } from 'react-navigation';
-import Shop from './src/components/Shop';
+import { createBottomTabNavigator, createAppContainer } from "react-navigation";
+import Shop from "./src/components/Shop";
 // import MyPage from './src/components/MyPage';
 
 // interface AppProps {
@@ -43,15 +41,6 @@ import Shop from './src/components/Shop';
 
 const AppContainer = createAppContainer(Shop);
 
-const mapStateToProps = (state: AppState) => ({
-  shops: state.shopReducer.shops,
-});
-
-const Content = connect(
-  mapStateToProps,
-  { getShop },
-)(AppContainer);
-
 interface State {
   isFontLoded: Boolean;
 }
@@ -70,7 +59,7 @@ class App extends React.Component<State> {
   render() {
     return (
       <Provider store={store}>
-        <Content />
+        <AppContainer />
       </Provider>
     );
   }

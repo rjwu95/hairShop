@@ -13,8 +13,8 @@ import Swiper from 'react-native-swiper';
 import HeaderImageScrollView from 'react-native-image-header-scroll-view';
 import { NavigationScreenProp } from 'react-navigation';
 import { Ionicons } from '@expo/vector-icons';
-import { Shop, Menu } from '../../reducers/types';
 import MapDetail from './MapDetail';
+import { Menu, Shop } from '../../reducers/shopSlice';
 
 const { height } = Dimensions.get('window');
 // const fakeData = [
