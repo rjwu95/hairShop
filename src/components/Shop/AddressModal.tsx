@@ -12,13 +12,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import region from "./region.json";
-import axios from "axios";
-import { serverUrl } from "../../../config.json";
-import { Location, Permissions } from "expo";
 import { changeMode } from "../../reducers/modeSlice";
 import { toggleAddressModal } from "../../reducers/addressSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
+import * as shopAPI from "../../apis/shopAPI";
 
 const convertedCity = {
   서울특별시: "서울",
@@ -60,30 +58,9 @@ const AddressModal = (props: Props) => {
     dispatch(toggleAddressModal());
   };
 
-  const getCurrentLocation = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== "granted") {
-      console.log("Permission to access location was denied");
-    }
-
-    let location = await Location.getCurrentPositionAsync({
-      accuracy: 0,
-    });
-    return location;
-  };
-
   const handleCurrentButton = async () => {
     dispatch(changeMode("current"));
-    const currentLocation = await getCurrentLocation();
-    const convertLocation = await axios.get(
-      `${serverUrl}/api/shop/convertLocation`,
-      {
-        headers: {
-          latitude: currentLocation.coords.latitude,
-          longitude: currentLocation.coords.longitude,
-        },
-      }
-    );
+    const convertLocation = await shopAPI.fetchConvertLocation();
     let convertLocationArr = convertLocation.data.split(" ");
     convertLocationArr[0] = convertedCity[convertLocationArr[0]];
     await AsyncStorage.setItem("recentRegion", convertLocationArr.join(" "));

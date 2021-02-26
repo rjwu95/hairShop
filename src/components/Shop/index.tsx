@@ -14,13 +14,11 @@ import {
 import AddressModal from "./AddressModal";
 import ShopEntry from "./ShopEntry";
 import ShopDetail from "./ShopDetail";
-import axios from "axios";
-import { serverUrl } from "../../../config.json";
 import { Ionicons } from "@expo/vector-icons";
-import { Permissions, Location } from "expo";
 import store from "../../store";
 import { getShop } from "../../reducers/shopSlice";
 import { toggleAddressModal } from "../../reducers/addressSlice";
+import * as shopAPI from "../../apis/shopAPI";
 
 interface Props {
   navigation: NavigationScreenProp<any, any>;
@@ -84,35 +82,15 @@ class ShopScreen extends React.Component<Props, localState> {
     });
     let shopResult;
     if (store.getState().mode.value === "region") {
-      shopResult = await axios.get(
-        encodeURI(`${serverUrl}/api/shop/getShops/${recentRegion}`)
-      );
+      shopResult = await shopAPI.fetchByRegion(recentRegion);
     } else {
-      const currentLocation = await this.getCurrentLocation();
-      shopResult = await axios.get(`${serverUrl}/api/shop/currentLocation`, {
-        headers: {
-          latitude: currentLocation.coords.latitude,
-          longitude: currentLocation.coords.longitude,
-        },
-      });
+      shopResult = await shopAPI.fetchByLocation();
     }
     store.dispatch(getShop([...shopResult.data]));
     this.setState({
       tab: recentRegion.slice(0, 2),
     });
     this.setState({ isLoaded: true });
-  };
-
-  getCurrentLocation = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== "granted") {
-      console.log("Permission to access location was denied");
-    }
-
-    let location = await Location.getCurrentPositionAsync({
-      accuracy: 0,
-    });
-    return location;
   };
 
   handleLoadMore = () => {
