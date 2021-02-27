@@ -1,4 +1,10 @@
-import { CaseReducer, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  CaseReducer,
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
+import * as shopAPI from "../apis/shopAPI";
 
 export interface Menu {
   [key: string]: Array<any>;
@@ -20,6 +26,22 @@ export type ShopSlice = {
   value: Shop[];
 };
 
+export const fetchShopByRegion = createAsyncThunk(
+  "shop/fetchByRegionStatus",
+  async (region: string) => {
+    const response = await shopAPI.fetchByRegion(region);
+    return response.data;
+  }
+);
+
+export const fetchShopByLocation = createAsyncThunk(
+  "shop/fetchByLocationStatus",
+  async () => {
+    const response = await shopAPI.fetchByLocation();
+    return response.data;
+  }
+);
+
 const initialState: ShopSlice = {
   value: [],
 };
@@ -28,7 +50,6 @@ const getShopReducer: CaseReducer<ShopSlice, PayloadAction<Shop[]>> = (
   state,
   { payload }
 ) => {
-  console.log("reducer!!!!!");
   state.value = payload;
 };
 
@@ -37,6 +58,14 @@ export const shopSlice = createSlice({
   initialState,
   reducers: {
     getShop: getShopReducer,
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchShopByRegion.fulfilled, (state, action) => {
+      state.value = [...action.payload];
+    });
+    builder.addCase(fetchShopByLocation.fulfilled, (state, action) => {
+      state.value = [...action.payload];
+    });
   },
 });
 

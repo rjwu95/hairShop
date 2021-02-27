@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -16,9 +16,11 @@ import ShopEntry from "./ShopEntry";
 import ShopDetail from "./ShopDetail";
 import { Ionicons } from "@expo/vector-icons";
 import store from "../../store";
-import { getShop } from "../../reducers/shopSlice";
+import {
+  fetchShopByRegion,
+  fetchShopByLocation,
+} from "../../reducers/shopSlice";
 import { toggleAddressModal } from "../../reducers/addressSlice";
-import * as shopAPI from "../../apis/shopAPI";
 
 interface Props {
   navigation: NavigationScreenProp<any, any>;
@@ -74,19 +76,17 @@ class ShopScreen extends React.Component<Props, localState> {
     const { navigation } = this.props;
     let recentRegion =
       (await AsyncStorage.getItem("recentRegion")) || "서울 강남구";
-    await this.setState({
+    this.setState({
       recentRegion,
     });
     await navigation.setParams({
       recentRegion,
     });
-    let shopResult;
     if (store.getState().mode.value === "region") {
-      shopResult = await shopAPI.fetchByRegion(recentRegion);
+      store.dispatch(fetchShopByRegion(recentRegion));
     } else {
-      shopResult = await shopAPI.fetchByLocation();
+      store.dispatch(fetchShopByLocation());
     }
-    store.dispatch(getShop([...shopResult.data]));
     this.setState({
       tab: recentRegion.slice(0, 2),
     });

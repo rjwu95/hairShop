@@ -9,7 +9,6 @@ const changeModeReducer: CaseReducer<ModeSlice, PayloadAction<Mode>> = (
   state,
   { payload }
 ) => {
-  console.log("reducer!!!!!");
   state.value = payload;
 };
 const initialState: ModeSlice = {

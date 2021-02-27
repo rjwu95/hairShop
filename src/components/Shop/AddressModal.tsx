@@ -55,7 +55,7 @@ const AddressModal = (props: Props) => {
     const newRegion = props.tab + ` ${target}`;
     await AsyncStorage.setItem("recentRegion", newRegion);
     props.getShopRequest();
-    dispatch(toggleAddressModal());
+    toggleModal();
   };
 
   const handleCurrentButton = async () => {
@@ -65,20 +65,22 @@ const AddressModal = (props: Props) => {
     convertLocationArr[0] = convertedCity[convertLocationArr[0]];
     await AsyncStorage.setItem("recentRegion", convertLocationArr.join(" "));
     props.getShopRequest();
-    dispatch(toggleAddressModal());
+    toggleModal();
   };
+
+  const toggleModal = () => dispatch(toggleAddressModal());
 
   return (
     <Modal
       animationType="slide"
       transparent={false}
       visible={address.modal}
-      onRequestClose={() => dispatch(toggleAddressModal())}
+      onRequestClose={toggleModal}
     >
       <View style={styles.header}>
         <Text style={{ fontSize: 22, fontWeight: "600" }}>지역 선택</Text>
         <TouchableHighlight
-          onPress={() => dispatch(toggleAddressModal())}
+          onPress={toggleModal}
           style={{ width: 80, alignItems: "flex-end" }}
         >
           <Ionicons name="ios-close" size={40} />
